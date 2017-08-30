@@ -93,6 +93,7 @@ class Application(Gtk.Application):
         self.notify = None
         self.lastfm = None
         self.debug = False
+        self.__fs = None
         self.__externals_count = 0
         self.__init_proxy()
         GLib.set_application_name("Lollypop")
@@ -523,10 +524,12 @@ class Application(Gtk.Application):
         """
         if self.window and not self.__is_fs:
             from lollypop.fullscreen import FullScreen
-            fs = FullScreen(self, self.window)
-            fs.connect("destroy", self.__on_fs_destroyed)
+            self.__fs = FullScreen(self, self.window)
+            self.__fs.connect("destroy", self.__on_fs_destroyed)
             self.__is_fs = True
-            fs.show()
+            self.__fs.show()
+        elif self.window and self.__is_fs:
+            self.__fs.destroy()
 
     def __on_fs_destroyed(self, widget):
         """
