@@ -272,7 +272,7 @@ class Application(Gtk.Application):
         """
             Save window position and view
         """
-        if self.__fs:
+        if self.is_fullscreen():
             return
         if self.settings.get_value("save-state"):
             self.window.save_view_state()
@@ -521,12 +521,12 @@ class Application(Gtk.Application):
             @param action as Gio.SimpleAction
             @param param as GLib.Variant
         """
-        if self.window and not self.__fs:
+        if self.window and not self.is_fullscreen():
             from lollypop.fullscreen import FullScreen
             self.__fs = FullScreen(self, self.window)
             self.__fs.connect("destroy", self.__on_fs_destroyed)
             self.__fs.show()
-        elif self.window and self.__fs:
+        elif self.window and self.is_fullscreen():
             self.__fs.destroy()
 
     def __on_fs_destroyed(self, widget):
