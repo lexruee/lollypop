@@ -148,7 +148,6 @@ class Application(Gtk.Application):
                                          None)
         except Exception as e:
             print("Application::init():", e)
-        self.__is_fs = False
 
         cssProviderFile = Lio.File.new_for_uri(
                 "resource:///org/gnome/Lollypop/application.css")
@@ -247,7 +246,7 @@ class Application(Gtk.Application):
         """
             Return True if application is fullscreen
         """
-        return self.__is_fs
+        return self.__fs is not None
 
     def set_mini(self, action, param):
         """
@@ -273,7 +272,7 @@ class Application(Gtk.Application):
         """
             Save window position and view
         """
-        if self.__is_fs:
+        if self.__fs:
             return
         if self.settings.get_value("save-state"):
             self.window.save_view_state()
@@ -522,13 +521,12 @@ class Application(Gtk.Application):
             @param action as Gio.SimpleAction
             @param param as GLib.Variant
         """
-        if self.window and not self.__is_fs:
+        if self.window and not self.__fs:
             from lollypop.fullscreen import FullScreen
             self.__fs = FullScreen(self, self.window)
             self.__fs.connect("destroy", self.__on_fs_destroyed)
-            self.__is_fs = True
             self.__fs.show()
-        elif self.window and self.__is_fs:
+        elif self.window and self.__fs:
             self.__fs.destroy()
 
     def __on_fs_destroyed(self, widget):
@@ -536,7 +534,7 @@ class Application(Gtk.Application):
             Mark fullscreen as False
             @param widget as Fullscreen
         """
-        self.__is_fs = False
+        self.__fs = None
         if not self.window.is_visible():
             self.quit(True)
 
